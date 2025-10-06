@@ -71,7 +71,10 @@ app.post("/api/auth/login", async (req, res) => {
 // EMPLOYEES
 
 app.get("/api/employees", authenticateToken, async (req, res) => {
-  const { data, error } = await supabase.from("employees").select("*");
+  const { data, error } = await supabase
+    .from("employees")
+    .select("*")
+    .eq("user_id", req.user.id);
   if (error)
     return res
       .status(500)
@@ -90,7 +93,7 @@ app.post("/api/employees", authenticateToken, async (req, res) => {
 
   const { data, error } = await supabase
     .from("employees")
-    .insert([{ name, surname, email }])
+    .insert([{ name, surname, email, user_id: req.user.id }])
     .select();
 
   if (error)
@@ -142,7 +145,10 @@ app.delete("/api/employees/:id", authenticateToken, async (req, res) => {
 // NOTES
 
 app.get("/api/notes", authenticateToken, async (req, res) => {
-  const { data, error } = await supabase.from("notes").select("*");
+  const { data, error } = await supabase
+    .from("notes")
+    .select("*")
+    .eq("user_id", req.user.id);
   if (error)
     return res
       .status(500)
@@ -167,7 +173,7 @@ app.post("/api/notes", authenticateToken, async (req, res) => {
 
   const { data, error } = await supabase
     .from("notes")
-    .insert([{ date, content, employee_id, type }])
+    .insert([{ date, content, employee_id, type, user_id: req.user.id }])
     .select();
 
   if (error)
@@ -253,7 +259,10 @@ app.get("/api/leaves/types", authenticateToken, async (req, res) => {
 // LEAVES
 
 app.get("/api/leaves", authenticateToken, async (req, res) => {
-  const { data, error } = await supabase.from("leaves").select("*");
+  const { data, error } = await supabase
+    .from("leaves")
+    .select("*")
+    .eq("user_id", req.user.id);
   if (error)
     return res
       .status(500)
@@ -281,7 +290,9 @@ app.post("/api/leaves", authenticateToken, async (req, res) => {
 
   const { data, error } = await supabase
     .from("leaves")
-    .insert([{ employee_id, type, start_date, end_date, note }])
+    .insert([
+      { employee_id, type, start_date, end_date, note, user_id: req.user.id },
+    ])
     .select();
 
   if (error)
