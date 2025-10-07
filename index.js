@@ -65,7 +65,7 @@ app.post("/api/auth/login", async (req, res) => {
     { expiresIn: "2h" }
   );
 
-  res.json({ message: "Login successful", token });
+  res.json({ message: "Login successful", token, user });
 });
 
 // EMPLOYEES
