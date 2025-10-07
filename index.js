@@ -42,30 +42,57 @@ app.post("/api/auth/register", async (req, res) => {
 });
 
 app.post("/api/auth/login", async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    console.log("📨 Login attempt:", req.body.email);
 
-  const { data: user, error } = await supabase
-    .from("users")
-    .select("*")
-    .eq("email", email)
-    .single();
+    const { email, password } = req.body;
 
-  if (error || !user) {
-    return res.status(400).json({ error: "Invalid email or password" });
+    // Validar que lleguen los datos
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
+    }
+
+    console.log("🔍 Querying user...");
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
+
+    if (error) {
+      console.error("❌ Supabase error:", error);
+      return res.status(400).json({ error: "Invalid email or password" });
+    }
+
+    if (!user) {
+      console.log("⚠️ User not found");
+      return res.status(400).json({ error: "Invalid email or password" });
+    }
+
+    console.log("🔐 Comparing passwords...");
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      console.log("❌ Password mismatch");
+      return res.status(400).json({ error: "Invalid email or password" });
+    }
+
+    console.log("🎟️ Generating token...");
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" }
+    );
+
+    // Eliminar la contraseña antes de enviar el user
+    delete user.password;
+
+    console.log("✅ Login successful");
+    res.json({ message: "Login successful", token, user });
+  } catch (err) {
+    console.error("💥 Server error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  const isMatch = await bcrypt.compare(password, user.password);
-
-  if (!isMatch)
-    return res.status(400).json({ error: "Invalid email or password" });
-
-  const token = jwt.sign(
-    { id: user.id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: "2h" }
-  );
-
-  res.json({ message: "Login successful", token, user });
 });
 
 // EMPLOYEES
