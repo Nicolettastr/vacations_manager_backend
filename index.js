@@ -5,7 +5,14 @@ const { validateLeaveType, validateNoteType } = require("./validations");
 const { authenticateToken } = require("./middleware/authMiddleware");
 
 const app = express();
+
 app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:9002",
+    credentials: true,
+  })
+);
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
