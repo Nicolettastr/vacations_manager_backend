@@ -22,6 +22,10 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 );
 
+app.get("/", (req, res) => {
+  res.send("Backend funcionando correctamente 🚀");
+});
+
 // AUTHENTICATION
 
 app.post("/api/auth/register", async (req, res) => {
@@ -51,16 +55,12 @@ app.post("/api/auth/register", async (req, res) => {
 
 app.post("/api/auth/login", async (req, res) => {
   try {
-    console.log("📨 Login attempt:", req.body.email);
-
     const { email, password } = req.body;
 
-    // Validar que lleguen los datos
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
-    console.log("🔍 Querying user...");
     const { data: user, error } = await supabase
       .from("users")
       .select("*")
@@ -68,37 +68,29 @@ app.post("/api/auth/login", async (req, res) => {
       .single();
 
     if (error) {
-      console.error("❌ Supabase error:", error);
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
     if (!user) {
-      console.log("⚠️ User not found");
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
-    console.log("🔐 Comparing passwords...");
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      console.log("❌ Password mismatch");
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
-    console.log("🎟️ Generating token...");
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
 
-    // Eliminar la contraseña antes de enviar el user
     delete user.password;
 
-    console.log("✅ Login successful");
     res.json({ message: "Login successful", token, user });
   } catch (err) {
-    console.error("💥 Server error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -389,6 +381,4 @@ app.delete("/api/leaves/:id", authenticateToken, async (req, res) => {
 // START SERVER
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () =>
-  console.log(`Servidor corriendo en http://localhost:${PORT}`)
-);
+app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
