@@ -1,9 +1,9 @@
-//require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const { createClient } = require("@supabase/supabase-js");
 const { validateLeaveType, validateNoteType } = require("./validations");
 const { authenticateToken } = require("./middleware/authMiddleware");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
@@ -15,19 +15,25 @@ app.use(
   })
 );
 
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+// Verificamos las variables de entorno
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+console.log("SUPABASE_URL:", supabaseUrl ? "OK" : "MISSING");
+console.log("SUPABASE_KEY:", supabaseKey ? "OK" : "MISSING");
 
-// Check environment variables
+let supabase = null;
 
-console.log("SUPABASE_URL:", process.env.SUPABASE_URL ? "OK" : "MISSING");
-console.log("SUPABASE_KEY:", process.env.SUPABASE_KEY ? "OK" : "MISSING");
+if (supabaseUrl && supabaseKey) {
+  const { createClient } = require("@supabase/supabase-js");
+  supabase = createClient(supabaseUrl, supabaseKey);
+  console.log("Supabase inicializado correctamente ✅");
+} else {
+  console.warn("Supabase no se inicializó. Algunas rutas no funcionarán ⚠️");
+}
 
+// Exportar supabase para usar en otros módulos
+module.exports.supabase = supabase;
 app.get("/", (req, res) => {
   res.send("Backend funcionando correctamente 🚀");
 });
