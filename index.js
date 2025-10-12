@@ -1,4 +1,4 @@
-require("dotenv").config();
+//require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { createClient } = require("@supabase/supabase-js");
@@ -21,6 +21,9 @@ const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
 );
+
+console.log("SUPABASE_URL:", process.env.SUPABASE_URL ? "OK" : "MISSING");
+console.log("SUPABASE_KEY:", process.env.SUPABASE_KEY ? "OK" : "MISSING");
 
 app.get("/", (req, res) => {
   res.send("Backend funcionando correctamente 🚀");
