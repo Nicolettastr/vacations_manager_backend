@@ -28,6 +28,10 @@ if (supabaseUrl && supabaseKey) {
   const { createClient } = require("@supabase/supabase-js");
   supabase = createClient(supabaseUrl, supabaseKey);
   console.log("Supabase inicializado correctamente ✅");
+
+  // Aquí llamamos a initSupabase para pasar el cliente a validations.js
+  const { initSupabase } = require("./validations");
+  initSupabase(supabase);
 } else {
   console.warn("Supabase no se inicializó. Algunas rutas no funcionarán ⚠️");
 }

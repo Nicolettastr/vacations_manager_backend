@@ -1,11 +1,14 @@
-const { createClient } = require("@supabase/supabase-js");
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+// validations.js
+let supabase = null;
 
+function initSupabase(client) {
+  supabase = client;
+}
+
+// Validaciones
 async function validateNoteType(type) {
   if (!type) return;
+  if (!supabase) throw new Error("Supabase no inicializado");
 
   const { data } = await supabase
     .from("note_types")
@@ -18,6 +21,7 @@ async function validateNoteType(type) {
 
 async function validateLeaveType(type) {
   if (!type) return;
+  if (!supabase) throw new Error("Supabase no inicializado");
 
   const { data } = await supabase
     .from("leave_types")
@@ -28,4 +32,4 @@ async function validateLeaveType(type) {
   if (!data) throw new Error("Invalid leave type");
 }
 
-module.exports = { validateNoteType, validateLeaveType };
+module.exports = { initSupabase, validateNoteType, validateLeaveType };
