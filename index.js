@@ -126,7 +126,7 @@ app.get("/api/employees", authenticateToken, async (req, res) => {
 });
 
 app.post("/api/employees", authenticateToken, async (req, res) => {
-  const { name, surname, email } = req.body;
+  const { name, surname, email, color } = req.body;
 
   if (!name || !surname || !email) {
     return res
@@ -136,7 +136,7 @@ app.post("/api/employees", authenticateToken, async (req, res) => {
 
   const { data, error } = await supabase
     .from("employees")
-    .insert([{ name, surname, email, user_id: req.user.id }])
+    .insert([{ name, surname, email, user_id: req.user.id, color }])
     .select();
 
   if (error)
