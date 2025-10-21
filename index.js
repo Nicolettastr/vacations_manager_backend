@@ -200,7 +200,7 @@ app.get("/api/notes", authenticateToken, async (req, res) => {
 });
 
 app.post("/api/notes", authenticateToken, async (req, res) => {
-  const { date, content, employee_id, type } = req.body;
+  const { date, content, employee_id, type, title } = req.body;
 
   if (!date || !content || !type) {
     return res
@@ -216,7 +216,7 @@ app.post("/api/notes", authenticateToken, async (req, res) => {
 
   const { data, error } = await supabase
     .from("notes")
-    .insert([{ date, content, employee_id, type, user_id: req.user.id }])
+    .insert([{ date, content, employee_id, type, title, user_id: req.user.id }])
     .select();
 
   if (error)
