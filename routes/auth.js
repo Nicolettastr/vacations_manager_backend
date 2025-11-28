@@ -71,4 +71,72 @@ router.post("/login", async (req, res) => {
   }
 });
 
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `http://localhost:9002/reset-password`,
+    });
+
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    res.json({
+      message: "If the email exists, a password reset link has been sent",
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to send reset email" });
+    console.error(error);
+  }
+});
+
+router.post("/reset-password", async (req, res) => {
+  const { password, access_token } = req.body;
+
+  if (!password || !access_token) {
+    return res.status(400).json({
+      error: "Password and access token are required",
+    });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({
+      error: "Password must be at least 6 characters",
+    });
+  }
+
+  try {
+    const supabaseWithToken = require("@supabase/supabase-js").createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_ANON_KEY,
+      {
+        global: {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        },
+      }
+    );
+
+    const { error } = await supabaseWithToken.auth.updateUser({
+      password: password,
+    });
+
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to reset password" });
+    console.error(error);
+  }
+});
+
 module.exports = router;
