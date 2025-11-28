@@ -31,6 +31,11 @@ router.post("/register", async (req, res) => {
     ]);
 
     if (dbError) {
+      if (dbError.code === "23505") {
+        return res
+          .status(400)
+          .json({ error: "User already exists in the database" });
+      }
       return res.status(500).json({ error: dbError.message });
     }
 
