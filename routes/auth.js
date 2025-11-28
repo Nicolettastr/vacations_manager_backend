@@ -85,20 +85,26 @@ router.post("/forgot-password", async (req, res) => {
   }
 
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `http://localhost:9002/reset-password`,
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "http://localhost:9002/reset-password",
     });
 
     if (error) {
+      console.error("Supabase forgot-password error:", error);
       return res.status(400).json({ error: error.message });
     }
 
-    res.json({
-      message: "If the email exists, a password reset link has been sent",
+    console.log("Reset password request sent successfully:", data);
+
+    return res.json({
+      message:
+        "If the email exists in our system, a password reset link has been sent successfully.",
     });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to send reset email" });
-    console.error(error);
+  } catch (err) {
+    console.error("Unexpected error in forgot-password:", err);
+    return res
+      .status(500)
+      .json({ error: err.message || "Failed to send reset email" });
   }
 });
 
