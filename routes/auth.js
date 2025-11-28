@@ -56,37 +56,25 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
-    const { data: user, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("email", email)
-      .single();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-    if (error) {
-      return res.status(400).json({ error: "Invalid email or password" });
-    }
-
-    if (!user) {
-      return res.status(400).json({ error: "Invalid email or password" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
+    if (error || !data.user) {
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: data.user.id, email: data.user.email },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
 
-    delete user.password;
-
-    res.json({ message: "Login successful", token, user });
+    res.json({ message: "Login successful", token, user: data.user });
   } catch (err) {
-    res.status(500).json({ error: "Internal server error", err });
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
