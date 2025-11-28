@@ -1,19 +1,19 @@
 const express = require("express");
-const cors = require("cors");
-
 const app = express();
+
 app.use(express.json());
 
-const corsOptions = {
-  origin: ["http://localhost:9002"],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-
-app.options("*", cors(corsOptions));
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:9002");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") return res.sendStatus(200);
+  next();
+});
 
 const authRoutes = require("./routes/auth");
 const employeeRoutes = require("./routes/employees");
@@ -30,8 +30,5 @@ app.use("/api/notes/types", noteTypesRoutes);
 app.use("/api/leaves/types", leaveTypesRoutes);
 
 app.get("/", (req, res) => res.send("Backend funcionando correctamente 🚀"));
-
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Backend funcionando en puerto ${PORT}`));
 
 module.exports = app;
