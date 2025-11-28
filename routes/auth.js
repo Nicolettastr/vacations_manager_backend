@@ -11,22 +11,36 @@ router.post("/register", async (req, res) => {
     return res.status(400).json({ error: "Email and password are required" });
   }
 
-  const hashPassword = await bcrypt.hash(password, 10);
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
 
-  const { data, error } = await supabase
-    .from("users")
-    .insert([{ email, password: hashPassword }])
-    .select();
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
 
-  if (error?.code === "23505") {
-    return res.status(400).json({ error: "Email already registered" });
+    const user = data.user;
+
+    const { error: dbError } = await supabase.from("users").insert([
+      {
+        id: user.id,
+        email: user.email,
+      },
+    ]);
+
+    if (dbError) {
+      return res.status(500).json({ error: dbError.message });
+    }
+
+    return res
+      .status(201)
+      .json({ message: "User registered successfully", user });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Internal server error" });
   }
-
-  if (error) return res.status(500).json({ error: error.message });
-
-  res
-    .status(201)
-    .json({ message: "User registered succesfully", user: data[0] });
 });
 
 router.post("/login", async (req, res) => {
