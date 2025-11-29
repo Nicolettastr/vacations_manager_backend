@@ -5,13 +5,9 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 
-// CORS para desarrollo + producción
 const corsOptions = {
-  origin: [
-    "http://localhost:9002", // tu front local
-    "https://teamtracker-omega.vercel.app", // tu front en Vercel
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  origin: ["http://localhost:9002", "https://teamtracker-omega.vercel.app"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 };
@@ -26,10 +22,12 @@ const leaveRoutes = require("./routes/leaves");
 const extraDaysRoutes = require("./routes/extraDays");
 const noteTypesRoutes = require("./routes/noteTypes");
 const leaveTypesRoutes = require("./routes/leavesTypes");
+const noteRoutes = require("./routes/notes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/leaves", leaveRoutes);
+app.use("/api/notes", noteRoutes);
 app.use("/api/extradays", extraDaysRoutes);
 app.use("/api/notes/types", noteTypesRoutes);
 app.use("/api/leaves/types", leaveTypesRoutes);
