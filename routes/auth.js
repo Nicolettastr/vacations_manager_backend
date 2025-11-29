@@ -80,6 +80,8 @@ router.post("/login", async (req, res) => {
 router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
 
+  console.log("mail", email);
+
   if (!email) {
     return res.status(400).json({ error: "Email is required" });
   }
