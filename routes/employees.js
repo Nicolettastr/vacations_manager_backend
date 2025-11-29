@@ -24,10 +24,25 @@ router.post("/", authenticateToken, async (req, res) => {
       .json({ error: "All fields (name, surname, email) are required" });
   }
 
+  const { data: existing } = await supabase
+    .from("employees")
+    .select("email")
+    .eq("email", email)
+    .eq("user_id", req.user.id)
+    .single();
+
+  if (existing) {
+    return res.status(400).json({ error: "Email already exists" });
+  }
+
   const { data, error } = await supabase
     .from("employees")
     .insert([{ name, surname, email, user_id: req.user.id, color }])
     .select();
+
+  if (error?.code === "23505") {
+    return res.status(400).json({ error: "Email already exists" });
+  }
 
   if (error)
     return res
