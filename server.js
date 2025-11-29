@@ -1,0 +1,46 @@
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+
+const app = express();
+app.use(express.json());
+
+// CORS para desarrollo + producción
+const corsOptions = {
+  origin: [
+    "http://localhost:9002", // tu front local
+    "https://teamtracker-omega.vercel.app", // tu front en Vercel
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
+// Rutas
+const authRoutes = require("./routes/auth");
+const employeeRoutes = require("./routes/employees");
+const leaveRoutes = require("./routes/leaves");
+const extraDaysRoutes = require("./routes/extraDays");
+const noteTypesRoutes = require("./routes/noteTypes");
+const leaveTypesRoutes = require("./routes/leavesTypes");
+
+app.use("/api/auth", authRoutes);
+app.use("/api/employees", employeeRoutes);
+app.use("/api/leaves", leaveRoutes);
+app.use("/api/extradays", extraDaysRoutes);
+app.use("/api/notes/types", noteTypesRoutes);
+app.use("/api/leaves/types", leaveTypesRoutes);
+
+app.get("/", (req, res) => {
+  res.send("Backend funcionando correctamente 🚀");
+});
+
+module.exports = app;
+
+if (require.main === module) {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => console.log(`Backend funcionando en puerto ${PORT}`));
+}

@@ -86,7 +86,7 @@ router.post("/forgot-password", async (req, res) => {
 
   try {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "http://localhost:9002/reset-password",
+      redirectTo: `https://teamtracker-omega.vercel.app/reset-password`,
     });
 
     if (error) {
