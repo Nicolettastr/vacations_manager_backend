@@ -1,10 +1,10 @@
 const jwt = require("jsonwebtoken");
 const express = require("express");
 const router = express.Router();
-const { supabase } = require("../supabaseClient");
+const { supabase, supabaseAdmin } = require("../supabaseClient");
 
 router.post("/register", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, name, lastname, avatar, theme } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ error: "Email and password are required" });
@@ -22,25 +22,29 @@ router.post("/register", async (req, res) => {
 
     const user = data.user;
 
-    const { error: dbError } = await supabase.from("users").insert([
+    const { error: dbError } = await supabaseAdmin.from("users").insert([
       {
         id: user.id,
         email: user.email,
+        name: name || null,
+        lastname: lastname || null,
+        avatar: avatar || "default.png",
+        theme: theme || "light",
+        extra: {
+          lang: "es",
+        },
       },
     ]);
 
     if (dbError) {
-      if (dbError.code === "23505") {
-        return res
-          .status(400)
-          .json({ error: "User already exists in the database" });
-      }
+      await supabaseAdmin.auth.admin.deleteUser(user.id);
       return res.status(500).json({ error: dbError.message });
     }
 
-    return res
-      .status(201)
-      .json({ message: "User registered successfully", user });
+    return res.status(201).json({
+      message: "User registered successfully",
+      user,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Internal server error" });
@@ -80,8 +84,6 @@ router.post("/login", async (req, res) => {
 router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
 
-  console.log("mail", email);
-
   if (!email) {
     return res.status(400).json({ error: "Email is required" });
   }
@@ -95,8 +97,6 @@ router.post("/forgot-password", async (req, res) => {
       console.error("Supabase forgot-password error:", error);
       return res.status(400).json({ error: error.message });
     }
-
-    console.log("Reset password request sent successfully:", data);
 
     return res.json({
       message:

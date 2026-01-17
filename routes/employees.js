@@ -15,6 +15,36 @@ router.get("/", authenticateToken, async (req, res) => {
   res.json(data);
 });
 
+router.get("/search", authenticateToken, async (req, res) => {
+  const { name } = req.query;
+  const { data, error } = await supabase
+    .from("employees")
+    .select("*")
+    .eq("user_id", req.user.id)
+    .or(`name.ilike.%${name}%,surname.ilike.%${name}%`);
+
+  if (error)
+    return res
+      .status(500)
+      .json({ error: "Failed to fetch employees", details: error });
+  res.json(data);
+});
+
+router.get("/used-colors", authenticateToken, async (req, res) => {
+  const { data, error } = await supabase
+    .from("employees")
+    .select("color")
+    .eq("user_id", req.user.id)
+    .not("color", "is", null);
+
+  if (error) {
+    return res.status(500).json({ error: "Failed to fetch colors" });
+  }
+
+  const uniqueColors = [...new Set(data.map((emp) => emp.color))];
+  res.json(uniqueColors);
+});
+
 router.post("/", authenticateToken, async (req, res) => {
   const { name, surname, email, color } = req.body;
 
@@ -39,10 +69,6 @@ router.post("/", authenticateToken, async (req, res) => {
     .from("employees")
     .insert([{ name, surname, email, user_id: req.user.id, color }])
     .select();
-
-  if (error?.code === "23505") {
-    return res.status(400).json({ error: "Email already exists" });
-  }
 
   if (error)
     return res

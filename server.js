@@ -23,6 +23,8 @@ const extraDaysRoutes = require("./routes/extraDays");
 const noteTypesRoutes = require("./routes/noteTypes");
 const leaveTypesRoutes = require("./routes/leavesTypes");
 const noteRoutes = require("./routes/notes");
+const userRoutes = require("./routes/user");
+const themesRoutes = require("./routes/themes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/employees", employeeRoutes);
@@ -31,6 +33,8 @@ app.use("/api/notes", noteRoutes);
 app.use("/api/extradays", extraDaysRoutes);
 app.use("/api/notes/types", noteTypesRoutes);
 app.use("/api/leaves/types", leaveTypesRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/themes", themesRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend funcionando correctamente 🚀");
