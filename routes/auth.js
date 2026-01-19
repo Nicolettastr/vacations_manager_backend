@@ -110,8 +110,59 @@ router.post("/forgot-password", async (req, res) => {
   }
 });
 
+// router.post("/reset-password", async (req, res) => {
+//   const { password, access_token } = req.body;
+
+//   if (!password || !access_token) {
+//     return res.status(400).json({
+//       error: "Password and access token are required",
+//     });
+//   }
+
+//   if (password.length < 6) {
+//     return res.status(400).json({
+//       error: "Password must be at least 6 characters",
+//     });
+//   }
+
+//   try {
+//     const supabaseWithToken = require("@supabase/supabase-js").createClient(
+//       process.env.SUPABASE_URL,
+//       process.env.SUPABASE_ANON_KEY,
+//       {
+//         global: {
+//           headers: {
+//             Authorization: `Bearer ${access_token}`,
+//           },
+//         },
+//       }
+//     );
+
+//     const { error } = await supabaseWithToken.auth.updateUser({
+//       password: password,
+//     });
+
+//     if (error) {
+//       return res.status(400).json({ error: error.message });
+//     }
+
+//     res.json({ message: "Password updated successfully" });
+//   } catch (error) {
+//     res.status(500).json({ error: "Failed to reset password" });
+//     console.error(error);
+//   }
+// });
+
 router.post("/reset-password", async (req, res) => {
   const { password, access_token } = req.body;
+
+  console.log("=== RESET PASSWORD DEBUG ===");
+  console.log("Password received:", !!password);
+  console.log("Access token received:", !!access_token);
+  console.log("Access token length:", access_token?.length);
+  console.log("Access token preview:", access_token?.substring(0, 50));
+  console.log("Full token:", access_token); // ← Ver el token completo
+  console.log("==========================");
 
   if (!password || !access_token) {
     return res.status(400).json({
@@ -138,9 +189,14 @@ router.post("/reset-password", async (req, res) => {
       }
     );
 
-    const { error } = await supabaseWithToken.auth.updateUser({
+    console.log("Supabase client created");
+
+    const { data, error } = await supabaseWithToken.auth.updateUser({
       password: password,
     });
+
+    console.log("Update response data:", data);
+    console.log("Update response error:", error);
 
     if (error) {
       return res.status(400).json({ error: error.message });
@@ -148,9 +204,8 @@ router.post("/reset-password", async (req, res) => {
 
     res.json({ message: "Password updated successfully" });
   } catch (error) {
+    console.error("Catch error:", error);
     res.status(500).json({ error: "Failed to reset password" });
-    console.error(error);
   }
 });
-
 module.exports = router;
