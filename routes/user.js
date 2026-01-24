@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const { authenticateToken } = require("../middleware/authMiddleware");
-const { supabase, supabaseAdmin } = require("../supabaseClient");
+const { supabaseAdmin } = require("../supabaseClient");
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
-    const { data: user, error } = await supabase
+    const { data: user, error } = await supabaseAdmin
       .from("users")
       .select("*")
       .eq("id", req.user.id)
@@ -49,7 +49,7 @@ router.patch("/users", authenticateToken, async (req, res) => {
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from("users")
       .update(updates)
       .eq("id", userId)
@@ -107,12 +107,13 @@ router.delete("/", authenticateToken, async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+    const { error: authError } =
+      await supabaseAdmin.auth.admin.deleteUser(userId);
     if (authError) {
       return res.status(500).json({ error: authError.message });
     }
 
-    const { error: dbError } = await supabase
+    const { error: dbError } = await supabaseAdmin
       .from("users")
       .delete()
       .eq("id", userId);

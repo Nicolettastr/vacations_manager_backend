@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { supabase } = require("../supabaseClient");
+const { supabaseAdmin } = require("../supabaseClient");
 const { authenticateToken } = require("../middleware/authMiddleware");
 
 router.get("/", authenticateToken, async (req, res) => {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("employees")
     .select("*")
     .eq("user_id", req.user.id);
@@ -17,7 +17,7 @@ router.get("/", authenticateToken, async (req, res) => {
 
 router.get("/search", authenticateToken, async (req, res) => {
   const { name } = req.query;
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("employees")
     .select("*")
     .eq("user_id", req.user.id)
@@ -31,7 +31,7 @@ router.get("/search", authenticateToken, async (req, res) => {
 });
 
 router.get("/used-colors", authenticateToken, async (req, res) => {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("employees")
     .select("color")
     .eq("user_id", req.user.id)
@@ -54,7 +54,7 @@ router.post("/", authenticateToken, async (req, res) => {
       .json({ error: "All fields (name, surname, email) are required" });
   }
 
-  const { data: existing } = await supabase
+  const { data: existing } = await supabaseAdmin
     .from("employees")
     .select("email")
     .eq("email", email)
@@ -65,7 +65,7 @@ router.post("/", authenticateToken, async (req, res) => {
     return res.status(400).json({ error: "Email already exists" });
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("employees")
     .insert([{ name, surname, email, user_id: req.user.id, color }])
     .select();
@@ -87,7 +87,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
       .json({ error: "At least one field must be provided to update" });
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("employees")
     .update(updates)
     .eq("id", id)
@@ -107,7 +107,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 router.delete("/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
 
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from("employees")
     .delete()
     .eq("id", id)

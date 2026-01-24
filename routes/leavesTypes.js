@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { supabase } = require("../supabaseClient");
+const { supabaseAdmin } = require("../supabaseClient");
 const { authenticateToken } = require("../middleware/authMiddleware");
 
 // LEAVE TYPES
 
 router.get("/", authenticateToken, async (req, res) => {
-  const { data, error } = await supabase.from("leave_types").select("*");
+  const { data, error } = await supabaseAdmin.from("leave_types").select("*");
   if (error)
     return res
       .status(500)

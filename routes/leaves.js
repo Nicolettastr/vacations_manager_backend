@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const { authenticateToken } = require("../middleware/authMiddleware");
-const { supabase } = require("../supabaseClient");
+const { supabaseAdmin } = require("../supabaseClient");
 const { validateLeaveType } = require("../validations");
 
 // LEAVES
 
 router.get("/", authenticateToken, async (req, res) => {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("leaves")
     .select("*")
     .eq("user_id", req.user.id);
@@ -36,7 +36,7 @@ router.post("/", authenticateToken, async (req, res) => {
     }
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("leaves")
     .insert([
       { employee_id, type, start_date, end_date, note, user_id: req.user.id },
@@ -64,7 +64,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
     }
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("leaves")
     .update(updates)
     .eq("id", id)
@@ -84,7 +84,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 router.delete("/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("leaves")
     .delete()
     .eq("id", id)

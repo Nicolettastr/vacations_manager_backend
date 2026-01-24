@@ -1,10 +1,10 @@
 const { authenticateToken } = require("../middleware/authMiddleware");
 const express = require("express");
 const router = express.Router();
-const { supabase } = require("../supabaseClient");
+const { supabaseAdmin } = require("../supabaseClient");
 
 router.get("/", authenticateToken, async (req, res) => {
-  const { data, error } = await supabase.from("themes").select("*");
+  const { data, error } = await supabaseAdmin.from("themes").select("*");
 
   if (error) {
     return res

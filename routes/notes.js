@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const { authenticateToken } = require("../middleware/authMiddleware");
-const { supabase } = require("../supabaseClient");
+const { supabaseAdmin } = require("../supabaseClient");
 
 const { validateNoteType } = require("../validations");
 
 router.get("/", authenticateToken, async (req, res) => {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("notes")
     .select("*")
     .eq("user_id", req.user.id);
@@ -32,7 +32,7 @@ router.post("/", authenticateToken, async (req, res) => {
     return res.status(400).json({ error: err.message });
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("notes")
     .insert([{ date, content, employee_id, type, title, user_id: req.user.id }])
     .select();
@@ -60,7 +60,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
     }
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("notes")
     .update(updates)
     .eq("id", id)
@@ -80,7 +80,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 router.delete("/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("notes")
     .delete()
     .eq("id", id)

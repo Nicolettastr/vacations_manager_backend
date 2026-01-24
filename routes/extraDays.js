@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { supabase } = require("../supabaseClient");
+const { supabaseAdmin } = require("../supabaseClient");
 const { authenticateToken } = require("../middleware/authMiddleware");
 
 router.get("/", authenticateToken, async (req, res) => {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("extra_days")
     .select("*, employees(name, surname)")
     .eq("user_id", req.user.id)
@@ -20,7 +20,7 @@ router.get("/", authenticateToken, async (req, res) => {
 router.get("/:id", authenticateToken, async (req, res) => {
   const { employeeId } = req.params;
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("extra_days")
     .select("*")
     .eq("employee_id", employeeId)
@@ -41,7 +41,7 @@ router.post("/", authenticateToken, async (req, res) => {
     return res.status(400).json({ error: "employee_id and days are required" });
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("extra_days")
     .insert([
       {
@@ -73,7 +73,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
   updates.updated_at = new Date().toISOString();
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("extra_days")
     .update(updates)
     .eq("id", id)
@@ -93,7 +93,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 router.delete("/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
 
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from("extra_days")
     .delete()
     .eq("id", id)
