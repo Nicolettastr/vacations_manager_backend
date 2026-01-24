@@ -63,19 +63,6 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
-    // const token = jwt.sign(
-    //   { id: data.user.id, email: data.user.email },
-    //   process.env.JWT_SECRET,
-    //   { expiresIn: "2h" },
-    // );
-
-    // res.json({
-    //   message: "Login successful",
-    //   token,
-    //   supabaseToken: data.session.access_token,
-    //   user: data.user
-    // });
-
     res.json({
       message: "Login successful",
       token: data.session.access_token,

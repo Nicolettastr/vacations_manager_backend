@@ -16,12 +16,12 @@ router.get("/", authenticateToken, async (req, res) => {
     }
 
     if (!user) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
+      return res.status(404).json({ error: "User not found" });
     }
 
     return res.json(user);
   } catch (err) {
-    return res.status(500).json({ error: "Error del servidor" }, err);
+    return res.status(500).json({ error: "Server error" }, err);
   }
 });
 
@@ -39,15 +39,13 @@ router.patch("/users", authenticateToken, async (req, res) => {
   }
 
   if (!Object.keys(updates).length) {
-    return res
-      .status(400)
-      .json({ error: "No hay campos válidos para actualizar" });
+    return res.status(400).json({ error: "No valid fields to update" });
   }
 
   if (updates.extra && typeof updates.extra !== "object") {
     return res
       .status(400)
-      .json({ error: "El campo 'extra' debe ser un objeto" });
+      .json({ error: "The 'extra' field must be an object" });
   }
 
   try {
@@ -67,11 +65,12 @@ router.patch("/users", authenticateToken, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 router.patch("/email", authenticateToken, async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
-    return res.status(400).json({ error: "Email requerido" });
+    return res.status(400).json({ error: "Email required" });
   }
 
   try {
@@ -96,7 +95,7 @@ router.patch("/email", authenticateToken, async (req, res) => {
     }
 
     res.json({
-      message: "Email actualizado. Revisa tu correo.",
+      message: "Email updated. Check your inbox.",
       user: authData,
     });
   } catch (error) {
@@ -122,7 +121,7 @@ router.delete("/", authenticateToken, async (req, res) => {
       return res.status(500).json({ error: dbError.message });
     }
 
-    return res.json({ message: "Usuario eliminado exitosamente" });
+    return res.json({ message: "User deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
