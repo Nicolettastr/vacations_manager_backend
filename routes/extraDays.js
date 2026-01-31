@@ -35,9 +35,9 @@ router.get("/:id", authenticateToken, async (req, res) => {
 });
 
 router.post("/", authenticateToken, async (req, res) => {
-  const { employee_id, days, reason, date } = req.body;
+  const { employee_id, extra_hours, reason, date } = req.body;
 
-  if (!employee_id || days === undefined) {
+  if (!employee_id || extra_hours === undefined) {
     return res.status(400).json({ error: "employee_id and days are required" });
   }
 
@@ -47,12 +47,12 @@ router.post("/", authenticateToken, async (req, res) => {
       {
         employee_id,
         user_id: req.user.id,
-        days,
+        extra_hours,
         reason,
         date: date || new Date().toISOString().split("T")[0],
       },
     ])
-    .select();
+    .select("*, employees(name, surname)");
 
   if (error)
     return res

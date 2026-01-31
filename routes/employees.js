@@ -4,14 +4,18 @@ const { supabaseAdmin } = require("../supabaseClient");
 const { authenticateToken } = require("../middleware/authMiddleware");
 
 router.get("/", authenticateToken, async (req, res) => {
-  const { data, error } = await supabaseAdmin
-    .from("employees")
-    .select("*")
-    .eq("user_id", req.user.id);
-  if (error)
-    return res
-      .status(500)
-      .json({ error: "Failed to fetch employees", details: error });
+  const { data, error } = await supabaseAdmin.rpc(
+    "get_employees_with_vacation_balance",
+    { p_user_id: req.user.id },
+  );
+
+  if (error) {
+    return res.status(500).json({
+      error: "Failed to fetch employees",
+      details: error,
+    });
+  }
+
   res.json(data);
 });
 
