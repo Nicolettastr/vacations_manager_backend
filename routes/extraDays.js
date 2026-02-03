@@ -17,7 +17,7 @@ router.get("/", authenticateToken, async (req, res) => {
   res.json(data);
 });
 
-router.get("/:id", authenticateToken, async (req, res) => {
+router.get("/:employeeId", authenticateToken, async (req, res) => {
   const { employeeId } = req.params;
 
   const { data, error } = await supabaseAdmin
@@ -27,10 +27,13 @@ router.get("/:id", authenticateToken, async (req, res) => {
     .eq("user_id", req.user.id)
     .order("date", { ascending: false });
 
-  if (error)
-    return res
-      .status(500)
-      .json({ error: "Failed to fetch employee extra days", details: error });
+  if (error) {
+    return res.status(500).json({
+      error: "Failed to fetch employee extra days",
+      details: error,
+    });
+  }
+
   res.json(data);
 });
 
