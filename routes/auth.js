@@ -5,7 +5,7 @@ const { authenticateToken } = require("../middleware/authMiddleware");
 const { createClient } = require("@supabase/supabase-js");
 
 router.post("/register", async (req, res) => {
-  const { email, password, name, lastname, avatar, theme } = req.body;
+  const { email, password, name, lastname, avatar, theme, lang } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ error: "Email and password are required" });
@@ -28,7 +28,7 @@ router.post("/register", async (req, res) => {
         lastname: lastname || null,
         avatar: avatar || "default.png",
         theme: theme || "light",
-        extra: { lang: "es" },
+        extra: { lang: lang || "en" },
       },
     ]);
 
