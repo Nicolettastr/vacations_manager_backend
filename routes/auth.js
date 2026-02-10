@@ -34,7 +34,14 @@ router.post("/register", async (req, res) => {
 
     if (dbError) {
       await supabaseAdmin.auth.admin.deleteUser(user.id);
-      return res.status(500).json({ error: dbError.message });
+
+      let message = "Internal server error";
+
+      if (dbError.code === "23505" || /duplicate key/i.test(dbError.message)) {
+        message = "El email ya está registrado";
+      }
+
+      return res.status(400).json({ error: message });
     }
 
     return res
