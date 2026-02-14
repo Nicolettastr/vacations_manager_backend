@@ -1,0 +1,20 @@
+name: Keep Supabase Active
+
+on:
+  schedule:
+    - cron: "*/5 * * * *" # ⚠️ Cada 5 minutos (SOLO PARA PRUEBAS)
+  workflow_dispatch: # Esto te permite ejecutarlo manualmente
+
+jobs:
+  ping-database:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Query Supabase
+        run: |
+          curl -X POST "${{ secrets.SUPABASE_URL }}/rest/v1/actions" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=minimal" \
+            -d '{"action": true}'
